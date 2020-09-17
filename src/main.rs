@@ -3,11 +3,7 @@ use std::io::BufReader;
 use std::sync::Arc;
 
 use clap::{App, Arg};
-use conllu::{
-    graph::Sentence,
-    io::{WriteSentence, Writer},
-    token::Token,
-};
+use futures::io::{AsyncBufReadExt, BufReader as AsyncBufReader};
 use sticker2::config::{Config, TomlRead};
 use tch::Device;
 use tide::{Body, Request, Response, Server, StatusCode};
@@ -15,23 +11,20 @@ use tide::{Body, Request, Response, Server, StatusCode};
 mod annotator;
 use annotator::Annotator;
 
-async fn handle_text(mut request: Request<State>) -> tide::Result {
-    let text = request.body_string().await?;
-    let tokenized = alpino_tokenizer::tokenize(&text)?;
-    let sentences: Vec<_> = tokenized
-        .into_iter()
-        .map(|s| s.into_iter().map(Token::new).collect::<Sentence>())
-        .collect();
-    let sentences = request.state().annotator.annotate_sentences(&sentences)?;
+mod io;
+use io::AnnotatorReader;
 
-    let mut data = Vec::new();
-    let mut writer = Writer::new(&mut data);
-    for sentence in sentences {
-        writer.write_sentence(&sentence.sentence)?;
-    }
+async fn handle_text(mut request: Request<State>) -> tide::Result {
+    let annotator_reader = AnnotatorReader::new(
+        request.state().annotator.clone(),
+        request.take_body().into_reader().lines(),
+    );
 
     Ok(Response::builder(StatusCode::Ok)
-        .body(Body::from_bytes(data))
+        .body(Body::from_reader(
+            AsyncBufReader::new(annotator_reader),
+            None,
+        ))
         .build())
 }
 

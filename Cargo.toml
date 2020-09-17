@@ -9,6 +9,7 @@ alpino-tokenizer = "0.2"
 anyhow = "1"
 clap = "2"
 conllu = "0.5"
+futures = "0.3"
 serde_yaml = "0.8"
 sticker2 = { version = "0.4", default-features = false }
 tch = "= 0.2.0"
