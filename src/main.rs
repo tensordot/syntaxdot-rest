@@ -8,16 +8,24 @@ use sticker2::config::{Config, TomlRead};
 use tch::Device;
 use tide::{Body, Request, Response, Server, StatusCode};
 
+mod async_conllu;
+use async_conllu::SentenceStreamReader;
+
+mod async_sticker;
+use async_sticker::{ToAnnotations, ToSentences};
+
 mod annotator;
 use annotator::Annotator;
 
-mod io;
-use io::AnnotatorReader;
-
 async fn handle_text(mut request: Request<State>) -> tide::Result {
-    let annotator_reader = AnnotatorReader::new(
-        request.state().annotator.clone(),
-        request.take_body().into_reader().lines(),
+    let annotator = request.state().annotator.clone();
+    let annotator_reader = SentenceStreamReader::new(
+        request
+            .take_body()
+            .into_reader()
+            .lines()
+            .sentences()
+            .annotations(annotator),
     );
 
     Ok(Response::builder(StatusCode::Ok)
