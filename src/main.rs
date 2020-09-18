@@ -17,6 +17,12 @@ use async_sticker::{ToAnnotations, ToSentences};
 mod annotator;
 use annotator::Annotator;
 
+async fn handle_index(_request: Request<State>) -> tide::Result {
+    Ok(Response::builder(StatusCode::Ok)
+        .body(Body::from_file("public/index.html").await?)
+        .build())
+}
+
 async fn handle_text(mut request: Request<State>) -> tide::Result {
     let annotator = request.state().annotator.clone();
     let annotator_reader = SentenceStreamReader::new(
@@ -61,6 +67,7 @@ async fn main() -> anyhow::Result<()> {
     let mut app = Server::with_state(State {
         annotator: Arc::new(annotator),
     });
+    app.at("/").get(handle_index);
     app.at("/").serve_dir("public/")?;
     app.at("/parse").post(handle_text);
     app.listen("127.0.0.1:8080").await?;
