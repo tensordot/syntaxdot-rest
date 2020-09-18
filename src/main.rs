@@ -61,7 +61,7 @@ async fn main() -> anyhow::Result<()> {
     let mut app = Server::with_state(State {
         annotator: Arc::new(annotator),
     });
-    app.at("/").get(|_| async { Ok("Hello, world!") });
+    app.at("/").serve_dir("public/")?;
     app.at("/parse").post(handle_text);
     app.listen("127.0.0.1:8080").await?;
     Ok(())

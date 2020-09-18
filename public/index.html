@@ -1,0 +1,90 @@
+<head>
+    <meta charset="utf-8">
+    <title>Dependency tree visualization</title>
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="css/jquery-ui-redmond.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/style-vis.css">
+    <style>
+        .show-hide-div {
+            display: none;
+        }
+
+        .conllu-wrap {
+            padding: 20px;
+        }
+    </style>
+
+    <script type="text/javascript" src="head.load.min.js"></script>
+</head>
+
+<body>
+
+  <form id="parseForm">
+    <textarea id="parseText" rows="10" cols="30">Dit is een test.</textarea> 
+    <input type="submit" value="Parse">
+  </form>
+
+
+<div class="conllu-wrap">
+<div id="parseConllu" class="conllu" tabs="false">
+1    Test
+</div>
+</div>
+
+</body>
+
+<script type="text/javascript">
+    head.js(
+        // External libraries
+        'lib/ext/jquery.min.js',
+        'lib/ext/jquery.svg.min.js',
+        'lib/ext/jquery.svgdom.min.js',
+        'lib/ext/jquery-ui.min.js',
+        'lib/ext/waypoints.min.js',
+
+        // brat helper modules
+        'lib/brat/configuration.js',
+        'lib/brat/util.js',
+        'lib/brat/annotation_log.js',
+        'lib/ext/webfont.js',
+        // brat modules
+        'lib/brat/dispatcher.js',
+        'lib/brat/url_monitor.js',
+        'lib/brat/visualizer.js',
+
+        // annotation documentation support
+        'lib/local/annodoc.js',
+        'lib/local/config.js',
+
+        // the conllu.js library itself
+        'conllu.js'
+    );
+
+    var webFontURLs = [
+        'static/fonts/PT_Sans-Caption-Web-Regular.ttf',
+        'static/fonts/Liberation_Sans-Regular.ttf'
+    ];
+
+    /* not used here */
+    var documentCollections = {};
+
+    head.ready(function() {
+	// performs all embedding and support functions
+	Annodoc.activate(Config.bratCollData, documentCollections);
+
+	$("#parseForm").submit(function( event ) {
+	    event.preventDefault();
+
+
+	    var text = $('#parseText').val();
+	    $.post("/parse", text, function(data) {
+		$("#parseConllu").text(data);
+		Annodoc.activate(Config.bratCollData, documentCollections);
+	    });
+	});
+    });
+</script>
+
+</html>
