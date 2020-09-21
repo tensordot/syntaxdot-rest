@@ -1,0 +1,28 @@
+name: "Test"
+on:
+  pull_request:
+  push:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v11
+        with:
+          extra_nix_config: |
+            substituters = https://cache.nixos.org s3://nix-cache?scheme=https&endpoint=s3.tensordot.com
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= s3.tensordot.com:s4s1OgfhdCw0tRZXqxaAG8wHVl0ftZfLdSmHms4yj1A=
+      - name: Storing pre-build store paths
+        run: nix path-info --all | grep -v '\.drv$' | sort > /tmp/pre-build-paths
+      - run: nix-build tests.nix
+      - name: Upload new store paths
+        if: ${{ always() }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
+        run: |
+          comm -13 /tmp/pre-build-paths <(nix path-info --all | grep -v '\.drv$' | sort) > /tmp/new-paths
+          echo "$NIX_SIGNING_KEY" > /tmp/sign-key
+          nix sign-paths --key-file /tmp/sign-key $(cat /tmp/new-paths)
+          nix copy -L --to "s3://nix-cache?scheme=https&endpoint=s3.tensordot.com" $(cat /tmp/new-paths)
