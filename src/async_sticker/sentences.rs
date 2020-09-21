@@ -10,12 +10,14 @@ use futures::ready;
 use futures::stream::Stream;
 use futures::task::{Context, Poll};
 
+type TokenizedSentences = Vec<Vec<String>>;
+
 enum SentencesState {
     Lines,
     Tokenize(
         Pin<
             Box<
-                dyn Future<Output = Result<Vec<Vec<String>>, alpino_tokenizer::TokenizeError>>
+                dyn Future<Output = Result<TokenizedSentences, alpino_tokenizer::TokenizeError>>
                     + Send
                     + Sync,
             >,
@@ -71,7 +73,7 @@ where
                     Ok(tokens) => {
                         let sentences = tokens
                             .into_iter()
-                            .map(|s| s.into_iter().map(|t| Token::new(t)).collect::<Sentence>())
+                            .map(|s| s.into_iter().map(Token::new).collect::<Sentence>())
                             .collect();
                         *state = SentencesState::Lines;
                         return Poll::Ready(Some(Ok(sentences)));
