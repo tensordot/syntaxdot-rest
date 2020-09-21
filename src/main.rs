@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::BufReader;
+use std::os::raw::c_int;
 use std::sync::Arc;
 
 use clap::{App, Arg};
@@ -44,6 +45,12 @@ struct State {
 fn load_model_config(filename: &str) -> anyhow::Result<Config> {
     let r = BufReader::new(File::open(filename)?);
     Config::from_toml_read(r)
+}
+
+#[allow(dead_code)]
+#[no_mangle]
+extern "C" fn mkl_serv_intel_cpu_true() -> c_int {
+    1
 }
 
 #[async_std::main]
