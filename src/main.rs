@@ -37,6 +37,15 @@ async fn handle_annotations(mut request: Request<State>) -> tide::Result {
         .build())
 }
 
+async fn handle_tokens(mut request: Request<State>) -> tide::Result {
+    let tokens_reader =
+        SentenceStreamReader::new(request.take_body().into_reader().lines().sentences());
+
+    Ok(Response::builder(StatusCode::Ok)
+        .body(Body::from_reader(AsyncBufReader::new(tokens_reader), None))
+        .build())
+}
+
 #[derive(Clone)]
 struct State {
     annotator: Arc<Annotator>,
@@ -70,6 +79,7 @@ async fn main() -> anyhow::Result<()> {
     });
     app.at("/").get(|_| async { Ok("Hello, world!") });
     app.at("/annotations").post(handle_annotations);
+    app.at("/tokens").post(handle_tokens);
     app.listen("127.0.0.1:8080").await?;
     Ok(())
 }
