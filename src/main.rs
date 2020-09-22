@@ -18,7 +18,7 @@ use async_sticker::{ToAnnotations, ToSentences};
 mod annotator;
 use annotator::Annotator;
 
-async fn handle_text(mut request: Request<State>) -> tide::Result {
+async fn handle_annotations(mut request: Request<State>) -> tide::Result {
     let annotator = request.state().annotator.clone();
     let annotator_reader = SentenceStreamReader::new(
         request
@@ -69,7 +69,7 @@ async fn main() -> anyhow::Result<()> {
         annotator: Arc::new(annotator),
     });
     app.at("/").get(|_| async { Ok("Hello, world!") });
-    app.at("/parse").post(handle_text);
+    app.at("/annotations").post(handle_annotations);
     app.listen("127.0.0.1:8080").await?;
     Ok(())
 }
