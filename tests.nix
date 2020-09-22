@@ -22,6 +22,12 @@ let
     };
 
     sticker2-rest = attr: {
+      src = sourceByRegex ./. [
+        "^Cargo\.toml$"
+        "^Cargo\.lock$"
+        ".*/[a-z_]+\.rs"
+      ];
+
       buildInputs = [ libtorch-bin ] ++
         lib.optional stdenv.isDarwin darwin.Security;
     };
@@ -41,15 +47,7 @@ let
   buildRustCrate = pkgs.buildRustCrate.override {
     defaultCrateOverrides = crateOverrides;
   };
-  crateTools = pkgs.callPackage "${sources.crate2nix}/tools.nix" {};
-  cargoNix = pkgs.callPackage (crateTools.generatedCargoNix {
-    name = "sticker2-rest";
-    src = sourceByRegex ./. [
-      "^Cargo\.toml$"
-      "^Cargo\.lock$"
-      ".*/[a-z_]+\.rs"
-    ];
-  }) {
+  cargoNix = pkgs.callPackage nix/Cargo.nix {
     inherit buildRustCrate;
   };
 in cargoNix.rootCrate.build
