@@ -11,7 +11,7 @@ clap = "2"
 conllu = "0.5"
 futures = "0.3"
 serde_yaml = "0.8"
-sticker2 = { version = "0.4", default-features = false }
+sticker2 = { git = "https://github.com/stickeritis/sticker2.git", default-features = false }
 tch = "= 0.2.0"
 tide = "0.13.0"
 async-std = { version = "1.6.0", features = ["attributes"] }
