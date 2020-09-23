@@ -20,6 +20,8 @@ use async_util::ToTryChunks;
 mod annotator;
 use annotator::Annotator;
 
+mod util;
+
 async fn handle_annotations(mut request: Request<State>) -> tide::Result {
     let annotator = request.state().annotator.clone();
     let annotator_reader = SentenceStreamReader::new(
