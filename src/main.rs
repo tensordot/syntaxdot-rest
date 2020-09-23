@@ -14,6 +14,9 @@ use async_conllu::SentenceStreamReader;
 mod async_sticker;
 use async_sticker::{ToAnnotations, ToSentences};
 
+mod async_util;
+use async_util::ToTryChunks;
+
 mod annotator;
 use annotator::Annotator;
 
@@ -25,6 +28,7 @@ async fn handle_annotations(mut request: Request<State>) -> tide::Result {
             .into_reader()
             .lines()
             .sentences()
+            .try_chunks(16)
             .annotations(annotator),
     );
 
@@ -37,8 +41,14 @@ async fn handle_annotations(mut request: Request<State>) -> tide::Result {
 }
 
 async fn handle_tokens(mut request: Request<State>) -> tide::Result {
-    let tokens_reader =
-        SentenceStreamReader::new(request.take_body().into_reader().lines().sentences());
+    let tokens_reader = SentenceStreamReader::new(
+        request
+            .take_body()
+            .into_reader()
+            .lines()
+            .sentences()
+            .try_chunks(16),
+    );
 
     Ok(Response::builder(StatusCode::Ok)
         .body(Body::from_reader(AsyncBufReader::new(tokens_reader), None))

@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::future::Future;
 use std::io::ErrorKind;
 use std::pin::Pin;
@@ -23,6 +24,7 @@ enum SentencesState {
             >,
         >,
     ),
+    Sentences(VecDeque<Sentence>),
 }
 
 pub struct Sentences<L> {
@@ -46,7 +48,7 @@ impl<L> Stream for Sentences<L>
 where
     L: Stream<Item = Result<String, Error>>,
 {
-    type Item = Result<Vec<Sentence>, Error>;
+    type Item = Result<Sentence, Error>;
 
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Option<Self::Item>> {
         let Sentences { lines, state } = &mut *self;
@@ -75,10 +77,19 @@ where
                             .into_iter()
                             .map(|s| s.into_iter().map(Token::new).collect::<Sentence>())
                             .collect();
-                        *state = SentencesState::Lines;
-                        return Poll::Ready(Some(Ok(sentences)));
+                        *state = SentencesState::Sentences(sentences);
                     }
                 },
+                SentencesState::Sentences(sentences) => {
+                    if sentences.is_empty() {
+                        *state = SentencesState::Lines;
+                        continue;
+                    }
+
+                    return Poll::Ready(Some(Ok(sentences
+                        .pop_front()
+                        .expect("Attempted to pop from empty buffer?"))));
+                }
             }
         }
     }
