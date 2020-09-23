@@ -1832,10 +1832,12 @@ dependencies = [
  "clap",
  "conllu",
  "futures",
+ "serde",
  "serde_yaml",
  "sticker2",
  "tch",
  "tide",
+ "toml",
  "unicode-normalization",
 ]
 
