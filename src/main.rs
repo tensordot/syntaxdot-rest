@@ -12,7 +12,7 @@ mod async_conllu;
 use async_conllu::SentenceStreamReader;
 
 mod async_sticker;
-use async_sticker::{ToAnnotations, ToSentences};
+use async_sticker::{Normalization, ToAnnotations, ToSentences, ToUnicodeCleanup};
 
 mod async_util;
 use async_util::ToTryChunks;
@@ -28,6 +28,7 @@ async fn handle_annotations(mut request: Request<State>) -> tide::Result {
             .into_reader()
             .lines()
             .sentences()
+            .unicode_cleanup(Normalization::NFC)
             .try_chunks(16)
             .annotations(annotator),
     );
@@ -47,6 +48,7 @@ async fn handle_tokens(mut request: Request<State>) -> tide::Result {
             .into_reader()
             .lines()
             .sentences()
+            .unicode_cleanup(Normalization::NFC)
             .try_chunks(16),
     );
 
