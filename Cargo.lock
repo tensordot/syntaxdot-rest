@@ -1836,6 +1836,7 @@ dependencies = [
  "sticker2",
  "tch",
  "tide",
+ "unicode-normalization",
 ]
 
 [[package]]

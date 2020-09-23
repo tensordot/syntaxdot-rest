@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 alpino-tokenizer = "0.2"
+async-std = { version = "1.6.0", features = ["attributes"] }
 anyhow = "1"
 clap = "2"
 conllu = "0.5"
@@ -14,4 +15,4 @@ serde_yaml = "0.8"
 sticker2 = { git = "https://github.com/stickeritis/sticker2.git", default-features = false }
 tch = "= 0.2.0"
 tide = "0.13.0"
-async-std = { version = "1.6.0", features = ["attributes"] }
+unicode-normalization = "0.1"
