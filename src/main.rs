@@ -39,6 +39,12 @@ fn pipeline_from_request(request: &Request<State>) -> Result<&Pipeline, Error> {
         })
 }
 
+async fn handle_index(_request: Request<State>) -> tide::Result {
+    Ok(Response::builder(StatusCode::Ok)
+        .body(Body::from_file("static/index.html").await?)
+        .build())
+}
+
 async fn handle_annotations(mut request: Request<State>) -> tide::Result {
     let body = request.take_body();
     let pipeline = pipeline_from_request(&request)?;
@@ -100,7 +106,8 @@ async fn main() -> anyhow::Result<()> {
 
     tide::log::start();
     let mut app = Server::with_state(State { pipelines, config });
-    app.at("/").get(|_| async { Ok("Hello, world!") });
+    app.at("/").get(handle_index);
+    app.at("/").serve_dir("static/")?;
     app.at("/annotations/:pipeline").post(handle_annotations);
     app.at("/pipelines").get(handle_pipelines);
     app.at("/tokens/:pipeline").post(handle_tokens);
