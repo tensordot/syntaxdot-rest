@@ -54,6 +54,19 @@ async fn handle_annotations(mut request: Request<State>) -> tide::Result {
         .build())
 }
 
+async fn handle_pipelines(request: Request<State>) -> tide::Result {
+    let pipelines = request
+        .state()
+        .pipelines
+        .keys()
+        .map(ToString::to_string)
+        .collect::<Vec<_>>();
+
+    Ok(Response::builder(StatusCode::Ok)
+        .body(Body::from_string(pipelines.join("\n")))
+        .build())
+}
+
 async fn handle_tokens(mut request: Request<State>) -> tide::Result {
     let body = request.take_body();
     let pipeline = pipeline_from_request(&request)?;
@@ -89,6 +102,7 @@ async fn main() -> anyhow::Result<()> {
     let mut app = Server::with_state(State { pipelines, config });
     app.at("/").get(|_| async { Ok("Hello, world!") });
     app.at("/annotations/:pipeline").post(handle_annotations);
+    app.at("/pipelines").get(handle_pipelines);
     app.at("/tokens/:pipeline").post(handle_tokens);
     app.listen("127.0.0.1:8080").await?;
     Ok(())
