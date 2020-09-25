@@ -1823,7 +1823,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "sticker2-web"
+name = "sticker2-rest"
 version = "0.1.0"
 dependencies = [
  "alpino-tokenizer",
