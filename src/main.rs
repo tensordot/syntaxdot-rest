@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fs::File;
+use std::path::PathBuf;
 
 use anyhow::anyhow;
 use clap::{App, Arg};
@@ -23,6 +24,7 @@ mod pipeline;
 use pipeline::Pipeline;
 
 mod util;
+use util::ServeFile;
 
 fn pipeline_from_request(request: &Request<State>) -> Result<&Pipeline, Error> {
     let pipeline_name: String = request.param("pipeline")?;
@@ -92,6 +94,12 @@ struct State {
 async fn main() -> anyhow::Result<()> {
     let matches = App::new("sticker2 REST server")
         .arg(Arg::with_name("config").required(true).index(1))
+        .arg(
+            Arg::with_name("static")
+                .long("static")
+                .takes_value(true)
+                .help("Static files to serve"),
+        )
         .get_matches();
 
     let config = Config::read(File::open(matches.value_of("config").unwrap())?)?;
@@ -100,7 +108,15 @@ async fn main() -> anyhow::Result<()> {
 
     tide::log::start();
     let mut app = Server::with_state(State { pipelines, config });
-    app.at("/").get(|_| async { Ok("Hello, world!") });
+
+    if let Some(dir) = matches.value_of("static") {
+        let mut index_path = PathBuf::from(dir);
+        index_path.push("index.html");
+
+        app.at("/").get(ServeFile::new(index_path)?);
+        app.at("/").serve_dir(dir)?;
+    }
+
     app.at("/annotations/:pipeline").post(handle_annotations);
     app.at("/pipelines").get(handle_pipelines);
     app.at("/tokens/:pipeline").post(handle_tokens);
