@@ -23,6 +23,7 @@ enum AnnotationsState {
 
 pub struct Annotations<S> {
     annotator: Arc<Annotator>,
+    batch_size: usize,
     sentences: Pin<Box<S>>,
     state: AnnotationsState,
 }
@@ -31,9 +32,10 @@ impl<S> Annotations<S>
 where
     S: Stream<Item = Result<Vec<Sentence>, Error>>,
 {
-    pub fn new(annotator: Arc<Annotator>, sentences: S) -> Self {
+    pub fn new(annotator: Arc<Annotator>, batch_size: usize, sentences: S) -> Self {
         Annotations {
             annotator,
+            batch_size,
             sentences: Box::pin(sentences),
             state: AnnotationsState::Sentences,
         }
@@ -49,9 +51,13 @@ where
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Option<Self::Item>> {
         let Annotations {
             annotator,
+            batch_size,
             sentences,
             state,
         } = &mut *self;
+
+        // Ensure that we do not borrow batch_size in the closure.
+        let batch_size = *batch_size;
 
         loop {
             match state {
@@ -60,7 +66,10 @@ where
                     Some(Err(err)) => return Poll::Ready(Some(Err(err))),
                     Some(Ok(sentences)) => {
                         let annotator = annotator.clone();
-                        let future = spawn(async move { annotator.annotate_sentences(&sentences) });
+                        let future =
+                            spawn(
+                                async move { annotator.annotate_sentences(&sentences, batch_size) },
+                            );
                         *state = AnnotationsState::Annotate(Box::pin(future));
                     }
                 },
@@ -80,14 +89,14 @@ where
 }
 
 pub trait ToAnnotations<S> {
-    fn annotations(self, annotator: Arc<Annotator>) -> Annotations<S>;
+    fn annotations(self, annotator: Arc<Annotator>, batch_size: usize) -> Annotations<S>;
 }
 
 impl<S> ToAnnotations<S> for S
 where
     S: Stream<Item = Result<Vec<Sentence>, Error>>,
 {
-    fn annotations(self, annotator: Arc<Annotator>) -> Annotations<S> {
-        Annotations::new(annotator, self)
+    fn annotations(self, annotator: Arc<Annotator>, batch_size: usize) -> Annotations<S> {
+        Annotations::new(annotator, batch_size, self)
     }
 }

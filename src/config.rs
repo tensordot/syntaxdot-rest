@@ -38,13 +38,19 @@ impl Config {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct PipelineConfig {
+    /// Batch size.
     batch_size: usize,
+
+    /// Number of batches to read ahead.
+    read_ahead: usize,
+
+    /// Sticker model configuration.
     sticker_config: String,
 }
 
 impl PipelineConfig {
     pub fn load(&self) -> Result<Pipeline> {
         let annotator = Annotator::load(Device::Cpu, &self.sticker_config)?;
-        Ok(Pipeline::new(annotator, self.batch_size))
+        Ok(Pipeline::new(annotator, self.batch_size, self.read_ahead))
     }
 }

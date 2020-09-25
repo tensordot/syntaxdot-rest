@@ -76,14 +76,24 @@ impl Annotator {
         })
     }
 
-    pub fn annotate_sentences(&self, sentences: &[Sentence]) -> Result<Vec<SentenceWithPieces>> where
-    {
+    pub fn annotate_sentences(
+        &self,
+        sentences: &[Sentence],
+        batch_size: usize,
+    ) -> Result<Vec<SentenceWithPieces>> where {
         let mut sentences_with_pieces = sentences
             .iter()
             .map(|s| self.tokenizer.tokenize(s.clone()))
             .collect::<Vec<_>>();
 
-        self.tagger.tag_sentences(&mut sentences_with_pieces)?;
+        // Sort sentences by length.
+        let mut sent_refs: Vec<_> = sentences_with_pieces.iter_mut().map(|s| s).collect();
+        sent_refs.sort_unstable_by_key(|s| s.pieces.len());
+
+        // Split in batches, tag, and merge results.
+        for batch in sent_refs.chunks_mut(batch_size) {
+            self.tagger.tag_sentences(batch)?;
+        }
 
         Ok(sentences_with_pieces)
     }
