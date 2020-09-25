@@ -7,6 +7,7 @@ edition = "2018"
 [dependencies]
 alpino-tokenizer = "0.2"
 async-std = { version = "1.6.0", features = ["attributes"] }
+async-trait = "0.1.40"
 anyhow = "1"
 clap = "2"
 conllu = "0.5"

@@ -1829,6 +1829,7 @@ dependencies = [
  "alpino-tokenizer",
  "anyhow",
  "async-std",
+ "async-trait",
  "clap",
  "conllu",
  "futures",
