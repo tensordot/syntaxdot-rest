@@ -12,13 +12,15 @@ use crate::async_util::ToTryChunks;
 pub struct Pipeline {
     annotator: Arc<Annotator>,
     batch_size: usize,
+    read_ahead: usize,
 }
 
 impl Pipeline {
-    pub fn new(annotator: Annotator, batch_size: usize) -> Self {
+    pub fn new(annotator: Annotator, batch_size: usize, read_ahead: usize) -> Self {
         Self {
             annotator: Arc::new(annotator),
             batch_size,
+            read_ahead,
         }
     }
 
@@ -27,8 +29,8 @@ impl Pipeline {
         S: Stream<Item = Result<String, Error>>,
     {
         self.sentences(text_stream)
-            .try_chunks(self.batch_size)
-            .annotations(self.annotator.clone())
+            .try_chunks(self.batch_size * self.read_ahead)
+            .annotations(self.annotator.clone(), self.batch_size)
     }
 
     pub fn sentences<S>(&self, text_stream: S) -> impl Stream<Item = Result<Sentence, Error>>
