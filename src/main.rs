@@ -1,10 +1,10 @@
-use std::collections::HashMap;
 use std::fs::File;
 use std::path::PathBuf;
 
 use anyhow::anyhow;
 use clap::{App, Arg};
 use futures::io::{AsyncBufReadExt, BufReader as AsyncBufReader};
+use indexmap::IndexMap;
 use serde::Serialize;
 use tide::{Body, Error, Request, Response, Server, StatusCode};
 
@@ -96,7 +96,7 @@ async fn handle_tokens(mut request: Request<State>) -> tide::Result {
 
 #[derive(Clone)]
 struct State {
-    pipelines: HashMap<String, Pipeline>,
+    pipelines: IndexMap<String, Pipeline>,
     config: Config,
 }
 
