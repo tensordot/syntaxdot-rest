@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use anyhow::anyhow;
 use clap::{App, Arg};
 use futures::io::{AsyncBufReadExt, BufReader as AsyncBufReader};
+use serde::Serialize;
 use tide::{Body, Error, Request, Response, Server, StatusCode};
 
 mod async_conllu;
@@ -25,6 +26,12 @@ use pipeline::Pipeline;
 
 mod util;
 use util::ServeFile;
+
+#[derive(Serialize)]
+struct PipelineDescription {
+    name: String,
+    description: String,
+}
 
 fn pipeline_from_request(request: &Request<State>) -> Result<&Pipeline, Error> {
     let pipeline_name: String = request.param("pipeline")?;
@@ -60,12 +67,15 @@ async fn handle_pipelines(request: Request<State>) -> tide::Result {
     let pipelines = request
         .state()
         .pipelines
-        .keys()
-        .map(ToString::to_string)
+        .iter()
+        .map(|(k, v)| PipelineDescription {
+            name: k.to_string(),
+            description: v.description().to_string(),
+        })
         .collect::<Vec<_>>();
 
     Ok(Response::builder(StatusCode::Ok)
-        .body(Body::from_string(pipelines.join("\n")))
+        .body(Body::from_json(&pipelines)?)
         .build())
 }
 

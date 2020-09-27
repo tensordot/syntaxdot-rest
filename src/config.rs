@@ -41,6 +41,9 @@ pub struct PipelineConfig {
     /// Batch size.
     batch_size: usize,
 
+    /// Pipeline description.
+    description: String,
+
     /// Number of batches to read ahead.
     read_ahead: usize,
 
@@ -51,6 +54,11 @@ pub struct PipelineConfig {
 impl PipelineConfig {
     pub fn load(&self) -> Result<Pipeline> {
         let annotator = Annotator::load(Device::Cpu, &self.sticker_config)?;
-        Ok(Pipeline::new(annotator, self.batch_size, self.read_ahead))
+        Ok(Pipeline::new(
+            self.description.clone(),
+            annotator,
+            self.batch_size,
+            self.read_ahead,
+        ))
     }
 }
