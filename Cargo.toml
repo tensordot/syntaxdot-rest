@@ -12,6 +12,7 @@ anyhow = "1"
 clap = "2"
 conllu = "0.5"
 futures = "0.3"
+indexmap = { version = "1", features = ["serde-1"] }
 serde = "1"
 serde_yaml = "0.8"
 sticker2 = { git = "https://github.com/stickeritis/sticker2.git", default-features = false }

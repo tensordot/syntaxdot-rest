@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use std::io::Read;
 
 use anyhow::Result;
+use indexmap::IndexMap;
 use serde::Deserialize;
 use tch::Device;
 
@@ -10,7 +10,7 @@ use crate::pipeline::Pipeline;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
-    pipelines: HashMap<String, PipelineConfig>,
+    pipelines: IndexMap<String, PipelineConfig>,
 }
 
 impl Config {
@@ -24,8 +24,8 @@ impl Config {
         Ok(toml::from_str(&toml)?)
     }
 
-    pub fn load(&self) -> Result<HashMap<String, Pipeline>> {
-        let mut pipelines = HashMap::new();
+    pub fn load(&self) -> Result<IndexMap<String, Pipeline>> {
+        let mut pipelines = IndexMap::new();
 
         for (language, pipeline_config) in &self.pipelines {
             let pipeline = pipeline_config.load()?;
