@@ -2,7 +2,9 @@ use std::collections::VecDeque;
 use std::future::Future;
 use std::io::ErrorKind;
 use std::pin::Pin;
+use std::sync::Arc;
 
+use alpino_tokenizer::Tokenizer;
 use async_std::task::spawn;
 use conllu::graph::Sentence;
 use conllu::token::Token;
@@ -15,31 +17,25 @@ type TokenizedSentences = Vec<Vec<String>>;
 
 enum SentencesState {
     Lines,
-    Tokenize(
-        Pin<
-            Box<
-                dyn Future<Output = Result<TokenizedSentences, alpino_tokenizer::TokenizeError>>
-                    + Send
-                    + Sync,
-            >,
-        >,
-    ),
+    Tokenize(Pin<Box<dyn Future<Output = Option<TokenizedSentences>> + Send + Sync>>),
     Sentences(VecDeque<Sentence>),
 }
 
 pub struct Sentences<L> {
     lines: Pin<Box<L>>,
     state: SentencesState,
+    tokenizer: Arc<dyn Tokenizer + Send + Sync>,
 }
 
 impl<L> Sentences<L>
 where
     L: Stream<Item = Result<String, Error>>,
 {
-    pub fn new(lines: L) -> Self {
+    pub fn new(tokenizer: Arc<dyn Tokenizer + Send + Sync>, lines: L) -> Self {
         Sentences {
             lines: Box::pin(lines),
             state: SentencesState::Lines,
+            tokenizer,
         }
     }
 }
@@ -51,7 +47,11 @@ where
     type Item = Result<Sentence, Error>;
 
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Option<Self::Item>> {
-        let Sentences { lines, state } = &mut *self;
+        let Sentences {
+            lines,
+            state,
+            tokenizer,
+        } = &mut *self;
 
         loop {
             match state {
@@ -64,15 +64,19 @@ where
                             continue;
                         }
 
-                        let future = spawn(async move { alpino_tokenizer::tokenize(&line) });
+                        let tokenizer = tokenizer.clone();
+                        let future = spawn(async move { tokenizer.tokenize(&line) });
                         *state = SentencesState::Tokenize(Box::pin(future));
                     }
                 },
                 SentencesState::Tokenize(future) => match ready!(future.as_mut().poll(cx)) {
-                    Err(err) => {
-                        return Poll::Ready(Some(Err(Error::new(ErrorKind::InvalidData, err))))
+                    None => {
+                        return Poll::Ready(Some(Err(Error::new(
+                            ErrorKind::InvalidData,
+                            "Cannot tokenize data".to_string(),
+                        ))))
                     }
-                    Ok(tokens) => {
+                    Some(tokens) => {
                         let sentences = tokens
                             .into_iter()
                             .map(|s| s.into_iter().map(Token::new).collect::<Sentence>())
@@ -96,14 +100,14 @@ where
 }
 
 pub trait ToSentences<L> {
-    fn sentences(self) -> Sentences<L>;
+    fn sentences(self, tokenizer: Arc<dyn Tokenizer + Send + Sync>) -> Sentences<L>;
 }
 
 impl<L> ToSentences<L> for L
 where
     L: Stream<Item = Result<String, Error>>,
 {
-    fn sentences(self) -> Sentences<L> {
-        Sentences::new(self)
+    fn sentences(self, tokenizer: Arc<dyn Tokenizer + Send + Sync>) -> Sentences<L> {
+        Sentences::new(tokenizer, self)
     }
 }
