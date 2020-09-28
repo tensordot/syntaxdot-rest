@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use alpino_tokenizer::Tokenizer;
 use conllu::graph::Sentence;
 use futures::io::Error;
 use futures::stream::Stream;
@@ -11,6 +12,7 @@ use crate::async_util::ToTryChunks;
 #[derive(Clone)]
 pub struct Pipeline {
     annotator: Arc<Annotator>,
+    tokenizer: Arc<dyn Tokenizer + Send + Sync>,
     batch_size: usize,
     description: String,
     read_ahead: usize,
@@ -20,11 +22,13 @@ impl Pipeline {
     pub fn new(
         description: String,
         annotator: Annotator,
+        tokenizer: Arc<dyn Tokenizer + Send + Sync>,
         batch_size: usize,
         read_ahead: usize,
     ) -> Self {
         Self {
             annotator: Arc::new(annotator),
+            tokenizer,
             batch_size,
             description,
             read_ahead,
@@ -48,6 +52,8 @@ impl Pipeline {
     where
         S: Stream<Item = Result<String, Error>>,
     {
-        text_stream.sentences().unicode_cleanup(Normalization::NFC)
+        text_stream
+            .sentences(self.tokenizer.clone())
+            .unicode_cleanup(Normalization::NFC)
     }
 }
