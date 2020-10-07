@@ -1,5 +1,5 @@
 [package]
-name = "sticker2-rest"
+name = "syntaxdot-rest"
 version = "0.1.0"
 authors = ["Daniël de Kok <me@danieldk.eu>"]
 edition = "2018"
@@ -15,8 +15,8 @@ futures = "0.3"
 indexmap = { version = "1", features = ["serde-1"] }
 serde = "1"
 serde_yaml = "0.8"
-sticker2 = { git = "https://github.com/stickeritis/sticker2.git", default-features = false }
-tch = "= 0.2.0"
+syntaxdot = { git = "ssh://git@github.com/tensordot/syntaxdot.git", branch = "main", default-features = false }
+tch = "0.2"
 tide = "0.13.0"
 toml = "0.5"
 unicode-normalization = "0.1"

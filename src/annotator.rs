@@ -5,11 +5,11 @@ use std::path::Path;
 
 use anyhow::{Context, Result};
 use conllu::graph::Sentence;
-use sticker2::config::{Config, PretrainConfig, TomlRead};
-use sticker2::encoders::Encoders;
-use sticker2::input::{SentenceWithPieces, Tokenize};
-use sticker2::model::bert::BertModel;
-use sticker2::tagger::Tagger;
+use syntaxdot::config::{Config, PretrainConfig, TomlRead};
+use syntaxdot::encoders::Encoders;
+use syntaxdot::input::{SentenceWithPieces, Tokenize};
+use syntaxdot::model::bert::BertModel;
+use syntaxdot::tagger::Tagger;
 use tch::nn::VarStore;
 use tch::Device;
 

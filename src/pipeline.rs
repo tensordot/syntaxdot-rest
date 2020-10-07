@@ -6,7 +6,7 @@ use futures::io::Error;
 use futures::stream::Stream;
 
 use crate::annotator::Annotator;
-use crate::async_sticker::{Normalization, ToAnnotations, ToSentences, ToUnicodeCleanup};
+use crate::async_syntaxdot::{Normalization, ToAnnotations, ToSentences, ToUnicodeCleanup};
 use crate::async_util::ToTryChunks;
 
 #[derive(Clone)]

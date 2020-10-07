@@ -1455,12 +1455,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "protobuf"
-version = "2.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb14183cc7f213ee2410067e1ceeadba2a7478a59432ff0747a335202798b1e2"
-
-[[package]]
 name = "quote"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1603,23 +1597,24 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "sentencepiece"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87b9bebe85ada6fef3074c37b00e96615355f94b95b6c81a4f3cc43e3a9e9404"
+checksum = "e31f59f09474e870616427c5c74b45a9a78dc485380c05e2487f0aef51be4fb8"
 dependencies = [
  "libc",
  "num-derive",
  "num-traits",
- "protobuf",
+ "prost",
+ "prost-derive",
  "sentencepiece-sys",
  "thiserror",
 ]
 
 [[package]]
 name = "sentencepiece-sys"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a6e06255c4aaea1a7a5e1850bf941a1db32dc14651dad29d2c5992b6b490fa9"
+checksum = "a4a3d684da1cca53529b3515bfdc29283f5d9fc06c6c1c8d939b5b42bc9aba2a"
 dependencies = [
  "cc",
  "cmake",
@@ -1807,80 +1802,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "213701ba3370744dcd1a12960caa4843b3d68b4d1c0a5d575e0d65b2ee9d16c0"
 
 [[package]]
-name = "sticker-encoders"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "828514b51ed0af805ffe0d71e9afcd7e92bc7b4555926eec33b786203ceb6539"
-dependencies = [
- "conllu",
- "edit_tree",
- "lazy_static",
- "numberer",
- "ohnomore",
- "ordered-float",
- "petgraph",
- "serde",
- "serde_derive",
- "thiserror",
-]
-
-[[package]]
-name = "sticker-transformers"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "553e85da263b780774765f9b53d02ae41d0844f616b36aef9a964edad791cb86"
-dependencies = [
- "serde",
- "tch",
- "thiserror",
-]
-
-[[package]]
-name = "sticker2"
-version = "0.4.0"
-source = "git+https://github.com/stickeritis/sticker2.git#559200178ed0974abc7239818a4475e942276022"
-dependencies = [
- "anyhow",
- "conllu",
- "edit_tree",
- "ndarray",
- "numberer",
- "ordered-float",
- "rand",
- "rand_xorshift",
- "sentencepiece",
- "serde",
- "serde_json",
- "sticker-encoders",
- "sticker-transformers",
- "tch",
- "thiserror",
- "toml",
- "wordpieces",
-]
-
-[[package]]
-name = "sticker2-rest"
-version = "0.1.0"
-dependencies = [
- "alpino-tokenizer",
- "anyhow",
- "async-std",
- "async-trait",
- "clap",
- "conllu",
- "futures",
- "indexmap",
- "serde",
- "serde_yaml",
- "sticker2",
- "tch",
- "tide",
- "toml",
- "unicode-normalization",
-]
-
-[[package]]
 name = "strsim"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1916,10 +1837,81 @@ dependencies = [
 ]
 
 [[package]]
+name = "syntaxdot"
+version = "0.1.0"
+source = "git+ssh://git@github.com/tensordot/syntaxdot.git?branch=main#d8d5eaa9fd040f1e3b70ebebd73b33486f77a6c7"
+dependencies = [
+ "conllu",
+ "edit_tree",
+ "ndarray",
+ "numberer",
+ "ordered-float",
+ "rand",
+ "rand_xorshift",
+ "sentencepiece",
+ "serde",
+ "serde_json",
+ "syntaxdot-encoders",
+ "syntaxdot-transformers",
+ "tch",
+ "thiserror",
+ "toml",
+ "wordpieces",
+]
+
+[[package]]
+name = "syntaxdot-encoders"
+version = "0.1.0"
+source = "git+ssh://git@github.com/tensordot/syntaxdot.git?branch=main#d8d5eaa9fd040f1e3b70ebebd73b33486f77a6c7"
+dependencies = [
+ "conllu",
+ "edit_tree",
+ "lazy_static",
+ "numberer",
+ "ohnomore",
+ "ordered-float",
+ "petgraph",
+ "serde",
+ "serde_derive",
+ "thiserror",
+]
+
+[[package]]
+name = "syntaxdot-rest"
+version = "0.1.0"
+dependencies = [
+ "alpino-tokenizer",
+ "anyhow",
+ "async-std",
+ "async-trait",
+ "clap",
+ "conllu",
+ "futures",
+ "indexmap",
+ "serde",
+ "serde_yaml",
+ "syntaxdot",
+ "tch",
+ "tide",
+ "toml",
+ "unicode-normalization",
+]
+
+[[package]]
+name = "syntaxdot-transformers"
+version = "0.1.0"
+source = "git+ssh://git@github.com/tensordot/syntaxdot.git?branch=main#d8d5eaa9fd040f1e3b70ebebd73b33486f77a6c7"
+dependencies = [
+ "serde",
+ "tch",
+ "thiserror",
+]
+
+[[package]]
 name = "tch"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6023f32ccd1eece94b8f582bfb5101842064aecc70850d12966ada7bb3838407"
+checksum = "57756d8b38ed254fbb9ed7cf47fdd0eb93ffe4d1aa927fd5ffa6b019d0fa4efd"
 dependencies = [
  "half",
  "lazy_static",
@@ -2056,9 +2048,9 @@ dependencies = [
 
 [[package]]
 name = "torch-sys"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9880d9b8799be31098ebd042e8ef57341434c63fe580754e07e8dd43bf8272c6"
+checksum = "69bad0036396fded468d8f6ea3105b99282dbb65d5da498f65c65e0816738417"
 dependencies = [
  "cc",
  "cmake",

@@ -11,7 +11,7 @@ use tide::{Body, Error, Request, Response, Server, StatusCode};
 mod async_conllu;
 use async_conllu::SentenceStreamReader;
 
-mod async_sticker;
+mod async_syntaxdot;
 
 mod async_util;
 use async_util::ToTryChunks;
@@ -102,7 +102,7 @@ struct State {
 
 #[async_std::main]
 async fn main() -> anyhow::Result<()> {
-    let matches = App::new("sticker2 REST server")
+    let matches = App::new("SyntaxDot REST server")
         .arg(Arg::with_name("config").required(true).index(1))
         .arg(
             Arg::with_name("static")
