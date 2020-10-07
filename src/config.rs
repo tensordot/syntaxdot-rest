@@ -57,8 +57,8 @@ pub struct PipelineConfig {
     /// Number of batches to read ahead.
     read_ahead: usize,
 
-    /// Sticker model configuration.
-    sticker_config: String,
+    /// SyntaxDot model configuration.
+    syntaxdot_config: String,
 
     /// Name of the tokenizer to use.
     tokenizer: String,
@@ -72,7 +72,7 @@ impl PipelineConfig {
         let tokenizer = tokenizers
             .get(&self.tokenizer)
             .ok_or_else(|| anyhow!("Unknown tokenizer `{}`", self.tokenizer))?;
-        let annotator = Annotator::load(Device::Cpu, &self.sticker_config)?;
+        let annotator = Annotator::load(Device::Cpu, &self.syntaxdot_config)?;
         Ok(Pipeline::new(
             self.description.clone(),
             annotator,
