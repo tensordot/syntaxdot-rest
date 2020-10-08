@@ -5,7 +5,7 @@ authors = ["Daniël de Kok <me@danieldk.eu>"]
 edition = "2018"
 
 [dependencies]
-alpino-tokenizer = { git = "https://github.com/danieldk/alpino-tokenizer" }
+alpino-tokenizer = "0.3"
 async-std = { version = "1.6.0", features = ["attributes"] }
 async-trait = "0.1.40"
 anyhow = "1"

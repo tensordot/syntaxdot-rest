@@ -86,8 +86,9 @@ dependencies = [
 
 [[package]]
 name = "alpino-tokenizer"
-version = "0.2.1"
-source = "git+https://github.com/danieldk/alpino-tokenizer#7d7357e68eb1f17c36ea2cc46cc8b477a6f4236e"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ede06afb0b4be3007c4a1a273d83cbde127070a01b0dd4fd3dd9b09450d3e9fc"
 dependencies = [
  "lazy_static",
  "prost",
