@@ -112,7 +112,8 @@ async fn main() -> anyhow::Result<()> {
         )
         .get_matches();
 
-    let config = Config::read(File::open(matches.value_of("config").unwrap())?)?;
+    let config_filename = matches.value_of("config").unwrap();
+    let config = Config::read(config_filename, File::open(config_filename)?)?;
 
     let pipelines = config.load()?;
 
