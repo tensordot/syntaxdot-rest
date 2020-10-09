@@ -91,8 +91,8 @@ mod tests {
             .into_iter()
             .collect();
         let chunks = block_on_stream(
-            stream::iter(vec![sentence.clone()])
-                .map(|v| Ok(v))
+            stream::iter(vec![sentence])
+                .map(Ok)
                 .unicode_cleanup(Normalization::NFC),
         )
         .collect::<Result<Vec<_>, _>>()

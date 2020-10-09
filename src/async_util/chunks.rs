@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn can_chunk() {
-        let chunks = block_on_stream(stream::iter(1..6).map(|v| Ok(v)).try_chunks(3))
+        let chunks = block_on_stream(stream::iter(1..6).map(Ok).try_chunks(3))
             .collect::<Result<Vec<_>, _>>()
             .unwrap();
 
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn can_chunk_multiple_of_chunk_size() {
-        let chunks = block_on_stream(stream::iter(1..=6).map(|v| Ok(v)).try_chunks(3))
+        let chunks = block_on_stream(stream::iter(1..=6).map(Ok).try_chunks(3))
             .collect::<Result<Vec<_>, _>>()
             .unwrap();
 
