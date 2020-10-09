@@ -87,7 +87,7 @@ impl Annotator {
             .collect::<Vec<_>>();
 
         // Sort sentences by length.
-        let mut sent_refs: Vec<_> = sentences_with_pieces.iter_mut().map(|s| s).collect();
+        let mut sent_refs: Vec<_> = sentences_with_pieces.iter_mut().collect();
         sent_refs.sort_unstable_by_key(|s| s.pieces.len());
 
         // Split in batches, tag, and merge results.
