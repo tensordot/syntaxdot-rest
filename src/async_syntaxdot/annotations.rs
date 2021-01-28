@@ -10,7 +10,7 @@ use futures::io::Error;
 use futures::ready;
 use futures::stream::Stream;
 use futures::task::{Context, Poll};
-use syntaxdot::input::SentenceWithPieces;
+use syntaxdot_tokenizers::SentenceWithPieces;
 
 use crate::annotator::Annotator;
 

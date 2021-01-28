@@ -11,12 +11,17 @@ async-trait = "0.1.40"
 anyhow = "1"
 clap = "2"
 conllu = "0.5"
+env_logger = "0.8"
 futures = "0.3"
 indexmap = { version = "1", features = ["serde-1"] }
+log = "0.4"
 serde = "1"
 serde_yaml = "0.8"
-syntaxdot = { git = "ssh://git@github.com/tensordot/syntaxdot.git", branch = "main", default-features = false }
-tch = "0.2"
+syntaxdot = { git = "https://github.com/tensordot/syntaxdot.git", branch = "main" }
+syntaxdot-encoders = { git = "https://github.com/tensordot/syntaxdot.git", branch = "main" }
+syntaxdot-tch-ext = { git = "https://github.com/tensordot/syntaxdot.git", branch = "main" }
+syntaxdot-tokenizers = { git = "https://github.com/tensordot/syntaxdot.git", branch = "main" }
+tch = "0.3"
 tide = "0.13.0"
 toml = "0.5"
 unicode-normalization = "0.1"
