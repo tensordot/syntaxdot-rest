@@ -5,10 +5,10 @@ use unicode_normalization::UnicodeNormalization;
 #[allow(unused)]
 pub enum Normalization {
     None,
-    NFD,
-    NFKD,
-    NFC,
-    NFKC,
+    Nfd,
+    Nfkd,
+    Nfc,
+    Nfkc,
 }
 
 fn normalization_iter<'a, I>(iter: I, norm: Normalization) -> Box<dyn Iterator<Item = char> + 'a>
@@ -19,10 +19,10 @@ where
 
     match norm {
         None => Box::new(iter),
-        NFD => Box::new(iter.nfd()),
-        NFKD => Box::new(iter.nfkd()),
-        NFC => Box::new(iter.nfc()),
-        NFKC => Box::new(iter.nfkc()),
+        Nfd => Box::new(iter.nfd()),
+        Nfkd => Box::new(iter.nfkd()),
+        Nfc => Box::new(iter.nfc()),
+        Nfkc => Box::new(iter.nfkc()),
     }
 }
 

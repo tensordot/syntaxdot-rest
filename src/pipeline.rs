@@ -54,6 +54,6 @@ impl Pipeline {
     {
         text_stream
             .sentences(self.tokenizer.clone())
-            .unicode_cleanup(Normalization::NFC)
+            .unicode_cleanup(Normalization::Nfc)
     }
 }
