@@ -11,6 +11,7 @@ use tch::Device;
 
 use crate::annotator::Annotator;
 use crate::pipeline::Pipeline;
+use crate::tokenizer::WhitespaceTokenizer;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
@@ -30,8 +31,9 @@ impl Config {
         let mut config: Config = toml::from_str(&toml)?;
 
         for tokenizer_config in config.tokenizers.values_mut() {
-            tokenizer_config.protobuf =
-                relativize_path(config_path.as_ref(), &tokenizer_config.protobuf)?;
+            if let TokenizerConfig::AlpinoTokenizer { ref mut protobuf } = tokenizer_config {
+                *protobuf = relativize_path(config_path.as_ref(), &protobuf)?;
+            }
         }
 
         for pipeline_config in config.pipelines.values_mut() {
@@ -98,15 +100,25 @@ impl PipelineConfig {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct TokenizerConfig {
-    /// Tokenizer protobuf file.
-    protobuf: String,
+pub enum TokenizerConfig {
+    /// Alpino tokenizer.
+    AlpinoTokenizer {
+        /// Tokenizer protobuf file.
+        protobuf: String,
+    },
+    /// Split a sentence on the space character.
+    WhitespaceTokenizer,
 }
 
 impl TokenizerConfig {
     pub fn load(&self) -> Result<Arc<dyn Tokenizer + Send + Sync>> {
-        let read = BufReader::new(File::open(&self.protobuf)?);
-        Ok(Arc::new(AlpinoTokenizer::from_buf_read(read)?))
+        match self {
+            TokenizerConfig::AlpinoTokenizer { protobuf } => {
+                let read = BufReader::new(File::open(protobuf)?);
+                Ok(Arc::new(AlpinoTokenizer::from_buf_read(read)?))
+            }
+            TokenizerConfig::WhitespaceTokenizer => Ok(Arc::new(WhitespaceTokenizer)),
+        }
     }
 }
 

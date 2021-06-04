@@ -24,6 +24,8 @@ pub use config::{Config, PipelineConfig};
 mod pipeline;
 use pipeline::Pipeline;
 
+mod tokenizer;
+
 mod util;
 use util::ServeFile;
 
