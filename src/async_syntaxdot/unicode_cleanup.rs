@@ -93,7 +93,7 @@ mod tests {
         let chunks = block_on_stream(
             stream::iter(vec![sentence])
                 .map(Ok)
-                .unicode_cleanup(Normalization::NFC),
+                .unicode_cleanup(Normalization::Nfc),
         )
         .collect::<Result<Vec<_>, _>>()
         .unwrap();
