@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use alpino_tokenizer::Tokenizer;
-use conllu::graph::Sentence;
 use futures::io::Error;
 use futures::stream::Stream;
+use udgraph::graph::Sentence;
 
 use crate::annotator::Annotator;
 use crate::async_syntaxdot::{Normalization, ToAnnotations, ToSentences, ToUnicodeCleanup};

@@ -1,13 +1,11 @@
 use std::pin::Pin;
 
-use conllu::{
-    graph::Sentence,
-    io::{WriteSentence, Writer},
-};
+use conllu::io::{WriteSentence, Writer};
 use futures::io::{AsyncRead, Error, ErrorKind};
 use futures::ready;
 use futures::stream::Stream;
 use futures::task::{Context, Poll};
+use udgraph::graph::Sentence;
 
 pub struct SentenceStreamReader<A> {
     annotations: Pin<Box<A>>,

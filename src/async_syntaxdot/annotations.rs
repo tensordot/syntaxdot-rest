@@ -5,12 +5,12 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use async_std::task::spawn;
-use conllu::graph::Sentence;
 use futures::io::Error;
 use futures::ready;
 use futures::stream::Stream;
 use futures::task::{Context, Poll};
 use syntaxdot_tokenizers::SentenceWithPieces;
+use udgraph::graph::Sentence;
 
 use crate::annotator::Annotator;
 
