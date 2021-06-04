@@ -1,10 +1,10 @@
 use std::pin::Pin;
 
-use conllu::graph::{Node, Sentence};
 use futures::io::Error;
 use futures::ready;
 use futures::stream::Stream;
 use futures::task::{Context, Poll};
+use udgraph::graph::{Node, Sentence};
 
 use super::unicode::{simplify_unicode, Normalization};
 
@@ -78,10 +78,10 @@ where
 mod tests {
     use std::iter;
 
-    use conllu::graph::Sentence;
-    use conllu::token::{Token, TokenBuilder};
     use futures::executor::block_on_stream;
     use futures::stream::{self, StreamExt};
+    use udgraph::graph::Sentence;
+    use udgraph::token::{Token, TokenBuilder};
 
     use super::{Normalization, ToUnicodeCleanup};
 

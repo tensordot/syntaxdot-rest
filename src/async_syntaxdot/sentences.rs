@@ -6,12 +6,12 @@ use std::sync::Arc;
 
 use alpino_tokenizer::Tokenizer;
 use async_std::task::spawn;
-use conllu::graph::Sentence;
-use conllu::token::Token;
 use futures::io::Error;
 use futures::ready;
 use futures::stream::Stream;
 use futures::task::{Context, Poll};
+use udgraph::graph::Sentence;
+use udgraph::token::Token;
 
 type TokenizedSentences = Vec<Vec<String>>;
 

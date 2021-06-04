@@ -541,13 +541,13 @@ dependencies = [
 
 [[package]]
 name = "conllu"
-version = "0.5.1"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01d7664c35fb4599e61f8f423a170331501fb2a2a36b691beb5d261707443dd1"
+checksum = "6028c5904fccbda78f6ed6c50630ff5c8b58f58dc9df8ecab380e3634b8e6f37"
 dependencies = [
  "itertools 0.9.0",
- "petgraph",
  "thiserror",
+ "udgraph",
 ]
 
 [[package]]
@@ -1042,6 +1042,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37d572918e350e82412fe766d24b15e6682fb2ed2bbe018280caa810397cb319"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1168,9 +1177,9 @@ dependencies = [
 
 [[package]]
 name = "ndarray"
-version = "0.13.1"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac06db03ec2f46ee0ecdca1a1c34a99c0d188a0d83439b84bf0cb4b386e4ab09"
+checksum = "6c0d5c9540a691d153064dc47a4db2504587a75eae07bf1d73f7a596ebc73c04"
 dependencies = [
  "matrixmultiply",
  "num-complex",
@@ -1181,11 +1190,10 @@ dependencies = [
 
 [[package]]
 name = "num-complex"
-version = "0.2.4"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6b19411a9719e753aff12e5187b74d60d3dc449ec3f4dc21e3989c3f554bc95"
+checksum = "747d632c0c558b87dbabbe6a82f3b4ae03720d0646ac5b7b4dae89394be5f2c5"
 dependencies = [
- "autocfg",
  "num-traits",
 ]
 
@@ -1247,17 +1255,17 @@ checksum = "1ab52be62400ca80aa00285d25253d7f7c437b7375c4de678f5405d3afe82ca5"
 
 [[package]]
 name = "ohnomore"
-version = "0.2.2"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ff292ecc7c1b14349a9c26e32ab672a9722553e2550a3376f191da546b4bd57"
+checksum = "77a85f1351b834be91a4e4d5d027cb3617dc7c9bf54b7731d376b51c53e470dd"
 dependencies = [
  "caseless",
- "conllu",
  "fst",
  "lazy_static",
  "maplit",
  "seqalign",
  "thiserror",
+ "udgraph",
  "unicode-normalization",
 ]
 
@@ -1300,9 +1308,9 @@ dependencies = [
 
 [[package]]
 name = "ordered-float"
-version = "1.1.0"
+version = "2.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3741934be594d77de1c8461ebcbbe866f585ea616a9753aa78f2bdc69f0e4579"
+checksum = "f100fcfb41e5385e0991f74981732049f9b896821542a219420491046baafdc2"
 dependencies = [
  "num-traits",
 ]
@@ -1583,9 +1591,9 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "sentencepiece"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e31f59f09474e870616427c5c74b45a9a78dc485380c05e2487f0aef51be4fb8"
+checksum = "5131aee706c699f1dccb06e88b72cae4efa1d4ab20ec447ee3c19aacdacbfaaa"
 dependencies = [
  "libc",
  "num-derive",
@@ -1598,9 +1606,9 @@ dependencies = [
 
 [[package]]
 name = "sentencepiece-sys"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4a3d684da1cca53529b3515bfdc29283f5d9fc06c6c1c8d939b5b42bc9aba2a"
+checksum = "c69535f0845e0d26858b82bd9b5fae6adadc5a94dbc4a0ba8ee5dca0718794f9"
 dependencies = [
  "cc",
  "cmake",
@@ -1812,8 +1820,9 @@ dependencies = [
 
 [[package]]
 name = "syntaxdot"
-version = "0.2.0"
-source = "git+https://github.com/tensordot/syntaxdot.git?branch=main#6ccbeaa1586a042c680d70f15d6ab415662b57e4"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "58d6e24d77c6f679e267ad75bf15492b5965146f58b22e31ba0205a8095c602e"
 dependencies = [
  "conllu",
  "log",
@@ -1831,27 +1840,28 @@ dependencies = [
  "tch",
  "thiserror",
  "toml",
+ "udgraph",
 ]
 
 [[package]]
 name = "syntaxdot-encoders"
-version = "0.2.0"
-source = "git+https://github.com/tensordot/syntaxdot.git?branch=main#6ccbeaa1586a042c680d70f15d6ab415662b57e4"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "afaaa43ee19615407bfd3d78744387c01ecf5383ce9763b85b52afb83126e2fb"
 dependencies = [
  "conllu",
- "itertools 0.9.0",
+ "itertools 0.10.0",
  "lazy_static",
  "ndarray",
  "numberer",
  "ohnomore",
  "ordered-float",
  "petgraph",
- "rand",
- "rand_xorshift",
  "seqalign",
  "serde",
  "serde_derive",
  "thiserror",
+ "udgraph",
 ]
 
 [[package]]
@@ -1877,34 +1887,38 @@ dependencies = [
  "tch",
  "tide",
  "toml",
+ "udgraph",
  "unicode-normalization",
 ]
 
 [[package]]
 name = "syntaxdot-tch-ext"
-version = "0.2.0"
-source = "git+https://github.com/tensordot/syntaxdot.git?branch=main#6ccbeaa1586a042c680d70f15d6ab415662b57e4"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0e6dec8e0cd57c3aa335d23bb128add7b9fcf880687d1c7f66b6e174433986c"
 dependencies = [
- "itertools 0.9.0",
+ "itertools 0.10.0",
  "tch",
 ]
 
 [[package]]
 name = "syntaxdot-tokenizers"
-version = "0.2.0"
-source = "git+https://github.com/tensordot/syntaxdot.git?branch=main#6ccbeaa1586a042c680d70f15d6ab415662b57e4"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94934c365a67f8606b839a45dfd03e5a343ac0ae38c44874c3cd72d51da17de2"
 dependencies = [
- "conllu",
  "ndarray",
  "sentencepiece",
  "thiserror",
+ "udgraph",
  "wordpieces",
 ]
 
 [[package]]
 name = "syntaxdot-transformers"
-version = "0.2.0"
-source = "git+https://github.com/tensordot/syntaxdot.git?branch=main#6ccbeaa1586a042c680d70f15d6ab415662b57e4"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2874144c6f88f40f3a25b49541411d0abc13ac4e89ea2938063da1ec7dd838f3"
 dependencies = [
  "serde",
  "syntaxdot-tch-ext",
@@ -1914,9 +1928,9 @@ dependencies = [
 
 [[package]]
 name = "tch"
-version = "0.3.1"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fec1d5951adaf4e2de38a094aedf98d44ae0a2e50e6bd7c924f798e0ca944f3"
+checksum = "7084208302780e83123c4784afb44a20073eb11838c0751aa098454805bf3d92"
 dependencies = [
  "half",
  "lazy_static",
@@ -2062,13 +2076,12 @@ dependencies = [
 
 [[package]]
 name = "torch-sys"
-version = "0.3.1"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8354bdb8a9f50da96c0eda743c7bccc747a319294d3ed3ffbce6f9ea2cea68da"
+checksum = "5f39b0156b0e15591a2278b6ee4afa83fbcdf4013b7fe751a4f905ed2f89521c"
 dependencies = [
  "anyhow",
  "cc",
- "cmake",
  "curl",
  "libc",
  "zip",
@@ -2079,6 +2092,15 @@ name = "typenum"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "373c8a200f9e67a0c95e62a4f52fbf80c23b4381c05a17845531982fa99e6b33"
+
+[[package]]
+name = "udgraph"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a8abeedb97ece847696e6d956f8899fddcdd96e5552c5401ba10ac69faecd42"
+dependencies = [
+ "petgraph",
+]
 
 [[package]]
 name = "unicode-bidi"
