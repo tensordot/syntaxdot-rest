@@ -105,7 +105,7 @@ impl Annotator {
         let mut sent_refs: Vec<_> = sentences_with_pieces.iter_mut().collect();
         sent_refs.sort_unstable_by_key(|s| s.pieces.len());
 
-        // Convince the type system that we are not borrowing SentProcessor, which is
+        // Convince the type system that we are not borrowing Annotator, which is
         // not Sync.
         let tagger = &self.tagger;
 
