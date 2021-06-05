@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::path::PathBuf;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Context};
 use clap::{App, Arg};
 use futures::io::{AsyncBufReadExt, BufReader as AsyncBufReader};
 use indexmap::IndexMap;
@@ -28,6 +28,10 @@ mod tokenizer;
 
 mod util;
 use util::ServeFile;
+
+const NUM_ANNOTATION_THREADS: &str = "NUM_ANNOTATION_THREADS";
+const NUM_INTEROP_THREADS: &str = "NUM_INTEROP_THREADS";
+const NUM_INTRAOP_THREADS: &str = "NUM_INTRAOP_THREADS";
 
 #[derive(Serialize)]
 struct PipelineDescription {
@@ -112,7 +116,54 @@ async fn main() -> anyhow::Result<()> {
                 .takes_value(true)
                 .help("Static files to serve"),
         )
+        .arg(
+            Arg::with_name(NUM_ANNOTATION_THREADS)
+                .help("Annotation threads")
+                .long("annotation-threads")
+                .value_name("N")
+                .default_value("4"),
+        )
+        .arg(
+            Arg::with_name(NUM_INTEROP_THREADS)
+                .help("Inter op parallelism threads")
+                .long("interop-threads")
+                .value_name("N")
+                .default_value("1"),
+        )
+        .arg(
+            Arg::with_name(NUM_INTRAOP_THREADS)
+                .help("Intra op parallelism threads")
+                .long("intraop-threads")
+                .value_name("N")
+                .default_value("1"),
+        )
         .get_matches();
+
+    let num_annotation_threads = matches
+        .value_of(NUM_ANNOTATION_THREADS)
+        .unwrap()
+        .parse()
+        .context("Cannot number of inter op threads")?;
+    let num_interop_threads = matches
+        .value_of(NUM_INTEROP_THREADS)
+        .unwrap()
+        .parse()
+        .context("Cannot number of inter op threads")?;
+    let num_intraop_threads = matches
+        .value_of(NUM_INTRAOP_THREADS)
+        .unwrap()
+        .parse()
+        .context("Cannot number of intra op threads")?;
+
+    // Set number of Torch threads.
+    tch::set_num_interop_threads(num_interop_threads);
+    tch::set_num_threads(num_intraop_threads);
+
+    // Rayon threads.
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(num_annotation_threads)
+        .build_global()
+        .unwrap();
 
     let config_filename = matches.value_of("config").unwrap();
     let config = Config::read(config_filename, File::open(config_filename)?)?;

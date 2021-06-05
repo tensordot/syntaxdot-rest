@@ -4,6 +4,7 @@ use std::ops::Deref;
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use rayon::prelude::{ParallelIterator, ParallelSliceMut};
 use syntaxdot::config::{BiaffineParserConfig, Config, PretrainConfig, TomlRead};
 use syntaxdot::encoders::Encoders;
 use syntaxdot::model::bert::BertModel;
@@ -104,10 +105,14 @@ impl Annotator {
         let mut sent_refs: Vec<_> = sentences_with_pieces.iter_mut().collect();
         sent_refs.sort_unstable_by_key(|s| s.pieces.len());
 
+        // Convince the type system that we are not borrowing SentProcessor, which is
+        // not Sync.
+        let tagger = &self.tagger;
+
         // Split in batches, tag, and merge results.
-        for batch in sent_refs.chunks_mut(batch_size) {
-            self.tagger.tag_sentences(batch)?;
-        }
+        sent_refs
+            .par_chunks_mut(batch_size)
+            .try_for_each(|batch| tagger.tag_sentences(batch))?;
 
         Ok(sentences_with_pieces)
     }
