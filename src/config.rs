@@ -70,6 +70,9 @@ pub struct PipelineConfig {
     /// Pipeline description.
     description: String,
 
+    /// Maximum sentence length in pieces.
+    max_len: Option<usize>,
+
     /// Number of batches to read ahead.
     read_ahead: usize,
 
@@ -88,7 +91,7 @@ impl PipelineConfig {
         let tokenizer = tokenizers
             .get(&self.tokenizer)
             .ok_or_else(|| anyhow!("Unknown tokenizer `{}`", self.tokenizer))?;
-        let annotator = Annotator::load(Device::Cpu, &self.syntaxdot_config)?;
+        let annotator = Annotator::load(Device::Cpu, &self.syntaxdot_config, self.max_len)?;
         Ok(Pipeline::new(
             self.description.clone(),
             annotator,

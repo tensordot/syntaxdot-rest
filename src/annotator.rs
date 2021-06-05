@@ -38,12 +38,13 @@ impl Deref for TaggerWrap {
 }
 
 pub struct Annotator {
+    max_len: Option<usize>,
     tagger: TaggerWrap,
     tokenizer: Box<dyn Tokenize>,
 }
 
 impl Annotator {
-    pub fn load<P>(device: Device, config_path: P) -> Result<Self>
+    pub fn load<P>(device: Device, config_path: P, max_len: Option<usize>) -> Result<Self>
     where
         P: AsRef<Path>,
     {
@@ -86,6 +87,7 @@ impl Annotator {
         let tagger = Tagger::new(device, model, biaffine_decoder, encoders);
 
         Ok(Annotator {
+            max_len,
             tagger: TaggerWrap(tagger),
             tokenizer,
         })
@@ -99,6 +101,11 @@ impl Annotator {
         let mut sentences_with_pieces = sentences
             .iter()
             .map(|s| self.tokenizer.tokenize(s.clone()))
+            .filter(|s| {
+                self.max_len
+                    .map(|max_len| s.pieces.len() <= max_len)
+                    .unwrap_or(true)
+            })
             .collect::<Vec<_>>();
 
         // Sort sentences by length.
