@@ -6,7 +6,9 @@ use futures::stream::Stream;
 use udgraph::graph::Sentence;
 
 use crate::annotator::Annotator;
-use crate::async_syntaxdot::{Normalization, ToAnnotations, ToSentences, ToUnicodeCleanup};
+use crate::async_syntaxdot::{
+    Normalization, ToAnnotations, ToMetadata, ToSentences, ToUnicodeCleanup,
+};
 use crate::async_util::ToTryChunks;
 
 #[derive(Clone)]
@@ -15,12 +17,14 @@ pub struct Pipeline {
     tokenizer: Arc<dyn Tokenizer + Send + Sync>,
     batch_size: usize,
     description: String,
+    name: String,
     read_ahead: usize,
 }
 
 impl Pipeline {
     pub fn new(
-        description: String,
+        description: impl ToString,
+        name: impl ToString,
         annotator: Annotator,
         tokenizer: Arc<dyn Tokenizer + Send + Sync>,
         batch_size: usize,
@@ -30,7 +34,8 @@ impl Pipeline {
             annotator: Arc::new(annotator),
             tokenizer,
             batch_size,
-            description,
+            description: description.to_string(),
+            name: name.to_string(),
             read_ahead,
         }
     }
@@ -42,10 +47,15 @@ impl Pipeline {
         self.sentences(text_stream)
             .try_chunks(self.batch_size * self.read_ahead)
             .annotations(self.annotator.clone(), self.batch_size)
+            .metadata(self.name())
     }
 
     pub fn description(&self) -> &str {
         &self.description
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
     }
 
     pub fn sentences<S>(&self, text_stream: S) -> impl Stream<Item = Result<Sentence, Error>>

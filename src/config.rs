@@ -53,9 +53,9 @@ impl Config {
 
         let mut pipelines = IndexMap::new();
 
-        for (language, pipeline_config) in &self.pipelines {
-            let pipeline = pipeline_config.load(&tokenizers)?;
-            pipelines.insert(language.to_string(), pipeline);
+        for (name, pipeline_config) in &self.pipelines {
+            let pipeline = pipeline_config.load(name, &tokenizers)?;
+            pipelines.insert(name.to_string(), pipeline);
         }
 
         Ok(pipelines)
@@ -86,6 +86,7 @@ pub struct PipelineConfig {
 impl PipelineConfig {
     pub fn load(
         &self,
+        name: &str,
         tokenizers: &IndexMap<String, Arc<dyn Tokenizer + Send + Sync>>,
     ) -> Result<Pipeline> {
         let tokenizer = tokenizers
@@ -93,7 +94,8 @@ impl PipelineConfig {
             .ok_or_else(|| anyhow!("Unknown tokenizer `{}`", self.tokenizer))?;
         let annotator = Annotator::load(Device::Cpu, &self.syntaxdot_config, self.max_len)?;
         Ok(Pipeline::new(
-            self.description.clone(),
+            &self.description,
+            name,
             annotator,
             tokenizer.clone(),
             self.batch_size,
