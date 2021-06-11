@@ -13,13 +13,18 @@ use crate::annotator::Annotator;
 use crate::pipeline::Pipeline;
 use crate::tokenizer::WhitespaceTokenizer;
 
+/// SyntaxDot REST server configuration
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
+    /// Tokenizers
     tokenizers: IndexMap<String, TokenizerConfig>,
+
+    /// Tokenizer + annotation pipelines
     pipelines: IndexMap<String, PipelineConfig>,
 }
 
 impl Config {
+    /// Read a SyntaxDot REST server configuration file.
     pub fn read<P, R>(config_path: P, mut read: R) -> Result<Self>
     where
         P: AsRef<Path>,
@@ -32,18 +37,19 @@ impl Config {
 
         for tokenizer_config in config.tokenizers.values_mut() {
             if let TokenizerConfig::AlpinoTokenizer { ref mut protobuf } = tokenizer_config {
-                *protobuf = relativize_path(config_path.as_ref(), &protobuf)?;
+                *protobuf = canonicalize_path(config_path.as_ref(), &protobuf)?;
             }
         }
 
         for pipeline_config in config.pipelines.values_mut() {
             pipeline_config.syntaxdot_config =
-                relativize_path(config_path.as_ref(), &pipeline_config.syntaxdot_config)?;
+                canonicalize_path(config_path.as_ref(), &pipeline_config.syntaxdot_config)?;
         }
 
         Ok(config)
     }
 
+    /// Load tokenizers and annotators and construct pipelines out of them.
     pub fn load(&self) -> Result<IndexMap<String, Pipeline>> {
         let mut tokenizers = IndexMap::new();
         for (name, tokenizer_config) in &self.tokenizers {
@@ -84,7 +90,8 @@ pub struct PipelineConfig {
 }
 
 impl PipelineConfig {
-    pub fn load(
+    /// Load a pipeline.
+    fn load(
         &self,
         name: &str,
         tokenizers: &IndexMap<String, Arc<dyn Tokenizer + Send + Sync>>,
@@ -104,6 +111,7 @@ impl PipelineConfig {
     }
 }
 
+/// Configuration for a tokenizer.
 #[derive(Clone, Debug, Deserialize)]
 pub enum TokenizerConfig {
     /// Alpino tokenizer.
@@ -111,11 +119,15 @@ pub enum TokenizerConfig {
         /// Tokenizer protobuf file.
         protobuf: String,
     },
-    /// Split a sentence on the space character.
+
+    /// Whitespace tokenizer.
+    ///
+    /// Splits sentences on `\n` or `\r\n`, split tokens on any ASCII whitespace.
     WhitespaceTokenizer,
 }
 
 impl TokenizerConfig {
+    /// Load a tokenizer.
     pub fn load(&self) -> Result<Arc<dyn Tokenizer + Send + Sync>> {
         match self {
             TokenizerConfig::AlpinoTokenizer { protobuf } => {
@@ -127,7 +139,13 @@ impl TokenizerConfig {
     }
 }
 
-fn relativize_path(config_path: &Path, filename: &str) -> Result<String> {
+/// Canonicalize a (relative) filename.
+///
+/// The configuration file can contain file names relative to the configuration
+/// file directory. However, the program can be run in a different directory
+/// than the configuration. This function gives the absolute path of a file
+/// name that is relative to a configuration file directory.
+fn canonicalize_path(config_path: &Path, filename: &str) -> Result<String> {
     if filename.is_empty() {
         return Ok(filename.to_owned());
     }
@@ -149,6 +167,7 @@ fn relativize_path(config_path: &Path, filename: &str) -> Result<String> {
             )
         })?
         .join(path)
+        .canonicalize()?
         .to_str()
         .ok_or_else(|| {
             anyhow!(

@@ -21,6 +21,7 @@ enum AnnotationsState {
     ),
 }
 
+/// Stream that produces annotations for tokenized sentences.
 pub struct Annotations<S> {
     annotator: Arc<Annotator>,
     batch_size: usize,

@@ -37,6 +37,7 @@ impl Deref for TaggerWrap {
     }
 }
 
+/// An annotator.
 pub struct Annotator {
     max_len: Option<usize>,
     tagger: TaggerWrap,
@@ -44,6 +45,7 @@ pub struct Annotator {
 }
 
 impl Annotator {
+    /// Load an annotator onto the given device.
     pub fn load<P>(device: Device, config_path: P, max_len: Option<usize>) -> Result<Self>
     where
         P: AsRef<Path>,
@@ -93,6 +95,11 @@ impl Annotator {
         })
     }
 
+    /// Annotate sentences.
+    ///
+    /// The sentences are sorted by length in pieces, batched and then annotated. The
+    /// returned sentences are in the same order as the sentences provided through the
+    /// `sentences` argument.
     pub fn annotate_sentences(
         &self,
         sentences: &[Sentence],

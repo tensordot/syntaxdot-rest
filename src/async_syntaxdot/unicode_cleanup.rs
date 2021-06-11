@@ -21,6 +21,7 @@ fn cleanup_sentence_unicode(sentence: &mut Sentence, normalization: Normalizatio
     }
 }
 
+/// Stream that normalizes unicode and replaces certain punctuation signs by ASCII approximations.
 pub struct UnicodeCleanup<L> {
     sentences: Pin<Box<L>>,
     normalization: Normalization,
