@@ -5,6 +5,7 @@ use futures::ready;
 use futures::stream::Stream;
 use futures::task::{Context, Poll};
 
+/// A stream that chunks items.
 pub struct TryChunks<St, I> {
     inner: Pin<Box<St>>,
     buf: Vec<I>,

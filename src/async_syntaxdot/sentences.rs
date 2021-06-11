@@ -21,6 +21,8 @@ enum SentencesState {
     Sentences(VecDeque<Sentence>),
 }
 
+/// Stream that tokenizes sentences.
+/// Stream that tokenizes sentences.
 pub struct Sentences<L> {
     lines: Pin<Box<L>>,
     state: SentencesState,

@@ -7,6 +7,7 @@ use futures::stream::Stream;
 use futures::task::{Context, Poll};
 use udgraph::graph::Sentence;
 
+/// Read [udgraph::graph::Sentence]s from a stream, output CoNLL-U.
 pub struct SentenceStreamReader<A> {
     annotations: Pin<Box<A>>,
     first_output: bool,

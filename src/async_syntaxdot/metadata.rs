@@ -15,6 +15,7 @@ enum MetadataState {
     Annotate(Pin<Box<dyn Future<Output = Result<Vec<Sentence>, anyhow::Error>> + Send + Sync>>),
 }
 
+/// Stream that adds metadata to sentences.
 pub struct Metadata<S> {
     pipeline_name: String,
     sentences: Pin<Box<S>>,

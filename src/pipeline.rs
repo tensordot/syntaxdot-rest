@@ -11,6 +11,7 @@ use crate::async_syntaxdot::{
 };
 use crate::async_util::ToTryChunks;
 
+/// An annotation pipeline.
 #[derive(Clone)]
 pub struct Pipeline {
     annotator: Arc<Annotator>,
@@ -22,6 +23,7 @@ pub struct Pipeline {
 }
 
 impl Pipeline {
+    /// Construct a new pipeline.
     pub fn new(
         description: impl ToString,
         name: impl ToString,
@@ -40,6 +42,7 @@ impl Pipeline {
         }
     }
 
+    /// Annotate a text stream.
     pub fn annotations<S>(&self, text_stream: S) -> impl Stream<Item = Result<Vec<Sentence>, Error>>
     where
         S: Stream<Item = Result<String, Error>>,
@@ -50,14 +53,17 @@ impl Pipeline {
             .metadata(self.name())
     }
 
+    /// Pipeline description.
     pub fn description(&self) -> &str {
         &self.description
     }
 
+    /// Pipeline name.
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    /// Tokenize sentences and apply unicode cleanup.
     pub fn sentences<S>(&self, text_stream: S) -> impl Stream<Item = Result<Sentence, Error>>
     where
         S: Stream<Item = Result<String, Error>>,
