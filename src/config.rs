@@ -30,10 +30,10 @@ impl Config {
         P: AsRef<Path>,
         R: Read,
     {
-        let mut toml = String::new();
-        read.read_to_string(&mut toml)?;
+        let mut yaml = String::new();
+        read.read_to_string(&mut yaml)?;
 
-        let mut config: Config = toml::from_str(&toml)?;
+        let mut config: Config = serde_yaml::from_str(&yaml)?;
 
         for tokenizer_config in config.tokenizers.values_mut() {
             if let TokenizerConfig::AlpinoTokenizer(ref mut protobuf) = tokenizer_config {
