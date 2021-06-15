@@ -27,13 +27,13 @@ impl Pipeline {
     pub fn new(
         description: impl ToString,
         name: impl ToString,
-        annotator: Annotator,
+        annotator: Arc<Annotator>,
         tokenizer: Arc<dyn Tokenizer + Send + Sync>,
         batch_size: usize,
         read_ahead: usize,
     ) -> Self {
         Self {
-            annotator: Arc::new(annotator),
+            annotator,
             tokenizer,
             batch_size,
             description: description.to_string(),
