@@ -1977,7 +1977,6 @@ dependencies = [
  "syntaxdot-tokenizers",
  "tch",
  "tide",
- "toml",
  "udgraph",
  "unicode-normalization",
 ]
