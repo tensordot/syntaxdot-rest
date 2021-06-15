@@ -36,7 +36,7 @@ impl Config {
         let mut config: Config = toml::from_str(&toml)?;
 
         for tokenizer_config in config.tokenizers.values_mut() {
-            if let TokenizerConfig::AlpinoTokenizer { ref mut protobuf } = tokenizer_config {
+            if let TokenizerConfig::AlpinoTokenizer(ref mut protobuf) = tokenizer_config {
                 *protobuf = canonicalize_path(config_path.as_ref(), &protobuf)?;
             }
         }
@@ -113,12 +113,13 @@ impl PipelineConfig {
 
 /// Configuration for a tokenizer.
 #[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum TokenizerConfig {
     /// Alpino tokenizer.
-    AlpinoTokenizer {
+    AlpinoTokenizer(
         /// Tokenizer protobuf file.
-        protobuf: String,
-    },
+        String,
+    ),
 
     /// Whitespace tokenizer.
     ///
@@ -130,7 +131,7 @@ impl TokenizerConfig {
     /// Load a tokenizer.
     pub fn load(&self) -> Result<Arc<dyn Tokenizer + Send + Sync>> {
         match self {
-            TokenizerConfig::AlpinoTokenizer { protobuf } => {
+            TokenizerConfig::AlpinoTokenizer(protobuf) => {
                 let read = BufReader::new(File::open(protobuf)?);
                 Ok(Arc::new(AlpinoTokenizer::from_buf_read(read)?))
             }
