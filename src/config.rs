@@ -16,11 +16,14 @@ use crate::tokenizer::WhitespaceTokenizer;
 /// SyntaxDot REST server configuration
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
+    /// Tokenizer + annotation pipelines
+    annotators: IndexMap<String, AnnotatorConfig>,
+
+    /// Pipelines
+    pipelines: IndexMap<String, PipelineConfig>,
+
     /// Tokenizers
     tokenizers: IndexMap<String, TokenizerConfig>,
-
-    /// Tokenizer + annotation pipelines
-    pipelines: IndexMap<String, PipelineConfig>,
 }
 
 impl Config {
@@ -41,9 +44,9 @@ impl Config {
             }
         }
 
-        for pipeline_config in config.pipelines.values_mut() {
-            pipeline_config.syntaxdot_config =
-                canonicalize_path(config_path.as_ref(), &pipeline_config.syntaxdot_config)?;
+        for annotator_config in config.annotators.values_mut() {
+            annotator_config.syntaxdot_config =
+                canonicalize_path(config_path.as_ref(), &annotator_config.syntaxdot_config)?;
         }
 
         Ok(config)
@@ -57,10 +60,15 @@ impl Config {
             tokenizers.insert(name.to_string(), tokenizer);
         }
 
-        let mut pipelines = IndexMap::new();
+        let mut annotators = IndexMap::new();
+        for (name, annotator_config) in &self.annotators {
+            let annotator = annotator_config.load()?;
+            annotators.insert(name.to_string(), Arc::new(annotator));
+        }
 
+        let mut pipelines = IndexMap::new();
         for (name, pipeline_config) in &self.pipelines {
-            let pipeline = pipeline_config.load(name, &tokenizers)?;
+            let pipeline = pipeline_config.new_pipeline(name, &annotators, &tokenizers)?;
             pipelines.insert(name.to_string(), pipeline);
         }
 
@@ -68,42 +76,61 @@ impl Config {
     }
 }
 
+/// Annotator configuration.
+#[derive(Clone, Debug, Deserialize)]
+pub struct AnnotatorConfig {
+    /// Maximum sentence length in pieces.
+    max_len: Option<usize>,
+
+    /// SyntaxDot model configuration.
+    syntaxdot_config: String,
+}
+
+impl AnnotatorConfig {
+    /// Load an annotator.
+    fn load(&self) -> Result<Annotator> {
+        Annotator::load(Device::Cpu, &self.syntaxdot_config, self.max_len)
+    }
+}
+
+/// Pipeline configuration.
 #[derive(Clone, Debug, Deserialize)]
 pub struct PipelineConfig {
+    /// Name of the annotator to use.
+    annotator: String,
+
     /// Batch size.
     batch_size: usize,
 
     /// Pipeline description.
     description: String,
 
-    /// Maximum sentence length in pieces.
-    max_len: Option<usize>,
-
     /// Number of batches to read ahead.
     read_ahead: usize,
-
-    /// SyntaxDot model configuration.
-    syntaxdot_config: String,
 
     /// Name of the tokenizer to use.
     tokenizer: String,
 }
 
 impl PipelineConfig {
-    /// Load a pipeline.
-    fn load(
+    fn new_pipeline(
         &self,
         name: &str,
+        annotators: &IndexMap<String, Arc<Annotator>>,
         tokenizers: &IndexMap<String, Arc<dyn Tokenizer + Send + Sync>>,
     ) -> Result<Pipeline> {
+        let annotator = annotators
+            .get(&self.annotator)
+            .ok_or_else(|| anyhow!("Unknown annotator `{}`", self.annotator))?;
+
         let tokenizer = tokenizers
             .get(&self.tokenizer)
             .ok_or_else(|| anyhow!("Unknown tokenizer `{}`", self.tokenizer))?;
-        let annotator = Annotator::load(Device::Cpu, &self.syntaxdot_config, self.max_len)?;
+
         Ok(Pipeline::new(
             &self.description,
             name,
-            annotator,
+            annotator.clone(),
             tokenizer.clone(),
             self.batch_size,
             self.read_ahead,
