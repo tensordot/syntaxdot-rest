@@ -32,6 +32,7 @@ use util::ServeFile;
 const NUM_ANNOTATION_THREADS: &str = "NUM_ANNOTATION_THREADS";
 const NUM_INTEROP_THREADS: &str = "NUM_INTEROP_THREADS";
 const NUM_INTRAOP_THREADS: &str = "NUM_INTRAOP_THREADS";
+const SERVER_ADDR: &str = "SERVER_ADDR";
 
 #[derive(Serialize)]
 struct PipelineDescription {
@@ -137,6 +138,12 @@ async fn main() -> anyhow::Result<()> {
                 .value_name("N")
                 .default_value("1"),
         )
+        .arg(
+            Arg::with_name(SERVER_ADDR)
+                .long("addr")
+                .help("Address to bind to (e.g. localhost:4000)")
+                .default_value("localhost:4000"),
+        )
         .get_matches();
 
     let num_annotation_threads = matches
@@ -184,6 +191,11 @@ async fn main() -> anyhow::Result<()> {
     app.at("/annotations/:pipeline").post(handle_annotations);
     app.at("/pipelines").get(handle_pipelines);
     app.at("/tokens/:pipeline").post(handle_tokens);
-    app.listen("127.0.0.1:8080").await?;
+    app.listen(
+        matches
+            .value_of(SERVER_ADDR)
+            .expect("Server address should be set"),
+    )
+    .await?;
     Ok(())
 }
